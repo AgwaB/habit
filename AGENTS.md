@@ -24,9 +24,12 @@
 - 2026-01-18 22:40 - Added missing Tailwind-like utility classes for indigo/gray and opacity variants to fix UI visibility.
 - 2026-01-18 23:10 - Added Vercel config to output `build/` for Vite.
 - 2026-01-18 23:13 - Switched Vite output to `dist/` to match Vercel defaults and updated vercel.json.
+- 2026-01-18 23:21 - Compacted calendar layout for better on-screen fit.
+- 2026-01-19 02:09 - Added task save lock to prevent double-submit on habit creation/edit.
+- 2026-01-19 02:18 - Added interactive calendar history editing UI, bottom sheet, and supporting utilities; wired log add/remove handlers.
 
 ## Tasks
 - [ ] Implement Supabase-backed habit tracker based on PRD/UIUX and `example/`.
-  - Work: Created `web/` app scaffold and Supabase client/env/mappers; updated date utils; added Supabase SQL migrations/RLS/config; wired Supabase reads/writes and UI loading/error states; documented setup steps.
-  - Next: Optional cleanup (remove `web/build`) and any requested tweaks.
-  - Status: Done.
+  - Work: Created `web/` app scaffold and Supabase client/env/mappers; updated date utils; added Supabase SQL migrations/RLS/config; wired Supabase reads/writes and UI loading/error states; documented setup steps; added save lock to prevent double-submit; added calendar history edit bottom sheet and handlers; heatmap always shows.
+  - Next: Verify UI alignment and adjust calendar size if needed.
+  - Status: In progress.

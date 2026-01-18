@@ -52,13 +52,19 @@ export default function App() {
     {
       id: "log2",
       taskId: "2",
-      performedAt: new Date(Date.now() - 86400000).toISOString(),
-      logicalDate: new Date(Date.now() - 86400000).toISOString().split("T")[0],
+      performedAt: new Date(
+        Date.now() - 86400000,
+      ).toISOString(),
+      logicalDate: new Date(Date.now() - 86400000)
+        .toISOString()
+        .split("T")[0],
     },
     {
       id: "log3",
       taskId: "2",
-      performedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+      performedAt: new Date(
+        Date.now() - 2 * 86400000,
+      ).toISOString(),
       logicalDate: new Date(Date.now() - 2 * 86400000)
         .toISOString()
         .split("T")[0],
@@ -66,12 +72,18 @@ export default function App() {
   ]);
 
   const [dayStartTime, setDayStartTime] = useState(0); // 0-23 hours
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<
+    string | null
+  >(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(
+    null,
+  );
 
-  const handleAddTask = (task: Omit<Task, "id" | "createdAt" | "status">) => {
+  const handleAddTask = (
+    task: Omit<Task, "id" | "createdAt" | "status">,
+  ) => {
     const newTask: Task = {
       ...task,
       id: Date.now().toString(),
@@ -82,15 +94,24 @@ export default function App() {
     setIsAddModalOpen(false);
   };
 
-  const handleEditTask = (taskId: string, updates: Partial<Task>) => {
-    setTasks(tasks.map((t) => (t.id === taskId ? { ...t, ...updates } : t)));
+  const handleEditTask = (
+    taskId: string,
+    updates: Partial<Task>,
+  ) => {
+    setTasks(
+      tasks.map((t) =>
+        t.id === taskId ? { ...t, ...updates } : t,
+      ),
+    );
     setEditingTask(null);
     setIsAddModalOpen(false);
   };
 
   const handleDeleteTask = (taskId: string) => {
     setTasks(
-      tasks.map((t) => (t.id === taskId ? { ...t, status: "archived" } : t)),
+      tasks.map((t) =>
+        t.id === taskId ? { ...t, status: "archived" } : t,
+      ),
     );
     setSelectedTaskId(null);
   };
@@ -98,12 +119,15 @@ export default function App() {
   const handleToggleTask = (taskId: string) => {
     const today = getLogicalDate(new Date(), dayStartTime);
     const existingLog = taskLogs.find(
-      (log) => log.taskId === taskId && log.logicalDate === today,
+      (log) =>
+        log.taskId === taskId && log.logicalDate === today,
     );
 
     if (existingLog) {
       // Remove the log (uncheck)
-      setTaskLogs(taskLogs.filter((log) => log.id !== existingLog.id));
+      setTaskLogs(
+        taskLogs.filter((log) => log.id !== existingLog.id),
+      );
     } else {
       // Add a new log (check)
       const newLog: TaskLog = {
@@ -129,19 +153,45 @@ export default function App() {
   const handleDecrementCounter = (taskId: string) => {
     const today = getLogicalDate(new Date(), dayStartTime);
     const logsToday = taskLogs.filter(
-      (log) => log.taskId === taskId && log.logicalDate === today,
+      (log) =>
+        log.taskId === taskId && log.logicalDate === today,
     );
 
     if (logsToday.length > 0) {
       const lastLog = logsToday[logsToday.length - 1];
+      setTaskLogs(
+        taskLogs.filter((log) => log.id !== lastLog.id),
+      );
+    }
+  };
+
+  const handleAddLogForDate = (taskId: string, date: string) => {
+    const newLog: TaskLog = {
+      id: Date.now().toString() + Math.random(),
+      taskId,
+      performedAt: new Date(date).toISOString(),
+      logicalDate: date,
+    };
+    setTaskLogs([...taskLogs, newLog]);
+  };
+
+  const handleRemoveLogForDate = (taskId: string, date: string) => {
+    const logsForDate = taskLogs.filter(
+      (log) => log.taskId === taskId && log.logicalDate === date,
+    );
+
+    if (logsForDate.length > 0) {
+      const lastLog = logsForDate[logsForDate.length - 1];
       setTaskLogs(taskLogs.filter((log) => log.id !== lastLog.id));
     }
   };
 
-  const activeTasks = tasks.filter((t) => t.status === "active");
+  const activeTasks = tasks.filter(
+    (t) => t.status === "active",
+  );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#F9F9F9]">
       {!selectedTaskId ? (
         <MainDashboard
           tasks={activeTasks}
@@ -156,7 +206,9 @@ export default function App() {
       ) : (
         <TaskDetailView
           task={tasks.find((t) => t.id === selectedTaskId)!}
-          taskLogs={taskLogs.filter((log) => log.taskId === selectedTaskId)}
+          taskLogs={taskLogs.filter(
+            (log) => log.taskId === selectedTaskId,
+          )}
           dayStartTime={dayStartTime}
           onBack={() => setSelectedTaskId(null)}
           onEdit={(task) => {
@@ -164,8 +216,18 @@ export default function App() {
             setIsAddModalOpen(true);
           }}
           onDelete={handleDeleteTask}
-          onIncrement={() => handleIncrementCounter(selectedTaskId)}
-          onDecrement={() => handleDecrementCounter(selectedTaskId)}
+          onIncrement={() =>
+            handleIncrementCounter(selectedTaskId)
+          }
+          onDecrement={() =>
+            handleDecrementCounter(selectedTaskId)
+          }
+          onAddLogForDate={(date) =>
+            handleAddLogForDate(selectedTaskId, date)
+          }
+          onRemoveLogForDate={(date) =>
+            handleRemoveLogForDate(selectedTaskId, date)
+          }
         />
       )}
 
@@ -174,7 +236,8 @@ export default function App() {
           task={editingTask}
           onSave={
             editingTask
-              ? (updates) => handleEditTask(editingTask.id, updates)
+              ? (updates) =>
+                  handleEditTask(editingTask.id, updates)
               : handleAddTask
           }
           onClose={() => {
@@ -188,11 +251,15 @@ export default function App() {
         <SettingsModal
           dayStartTime={dayStartTime}
           onDayStartTimeChange={setDayStartTime}
-          archivedTasks={tasks.filter((t) => t.status === "archived")}
+          archivedTasks={tasks.filter(
+            (t) => t.status === "archived",
+          )}
           onRestoreTask={(taskId) => {
             setTasks(
               tasks.map((t) =>
-                t.id === taskId ? { ...t, status: "active" } : t,
+                t.id === taskId
+                  ? { ...t, status: "active" }
+                  : t,
               ),
             );
           }}
@@ -203,7 +270,10 @@ export default function App() {
   );
 }
 
-function getLogicalDate(date: Date, dayStartHour: number): string {
+function getLogicalDate(
+  date: Date,
+  dayStartHour: number,
+): string {
   const adjustedDate = new Date(date);
   if (adjustedDate.getHours() < dayStartHour) {
     adjustedDate.setDate(adjustedDate.getDate() - 1);

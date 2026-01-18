@@ -1,5 +1,3 @@
-import { motion } from "framer-motion";
-
 interface DonutChartProps {
   current: number;
   target: number;
@@ -7,12 +5,7 @@ interface DonutChartProps {
   size?: number;
 }
 
-export function DonutChart({
-  current,
-  target,
-  color,
-  size = 64,
-}: DonutChartProps) {
+export function DonutChart({ current, target, color, size = 64 }: DonutChartProps) {
   const percentage = target > 0 ? Math.min((current / target) * 100, 100) : 0;
   const radius = (size - 8) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -29,10 +22,9 @@ export function DonutChart({
           fill="none"
           stroke="#E5E7EB"
           strokeWidth="4"
-          className="opacity-20"
         />
         {/* Progress circle */}
-        <motion.circle
+        <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
@@ -40,21 +32,15 @@ export function DonutChart({
           stroke={color}
           strokeWidth="4"
           strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="transition-all duration-500 ease-out"
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <motion.span
-          key={current}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="text-sm font-mono font-medium text-[#333333]"
-        >
+        <span className="text-sm font-mono text-[#333333]">
           {current}/{target}
-        </motion.span>
+        </span>
       </div>
     </div>
   );

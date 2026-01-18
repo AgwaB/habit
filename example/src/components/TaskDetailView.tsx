@@ -1,14 +1,10 @@
-import { ArrowLeft, MoreVertical, Minus, Plus } from "lucide-react";
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Task, TaskLog } from "../types";
-import { Calendar } from "./Calendar";
-import { Heatmap } from "./Heatmap";
-import {
-  getWeekProgress,
-  getMonthProgress,
-  getStreak,
-} from "../utils/dateUtils";
+import { ArrowLeft, MoreVertical, Minus, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Task, TaskLog } from '../types';
+import { Calendar } from './Calendar';
+import { Heatmap } from './Heatmap';
+import { EditDateBottomSheet } from './EditDateBottomSheet';
+import { getWeekProgress, getMonthProgress, getStreak } from '../utils/dateUtils';
 
 interface TaskDetailViewProps {
   task: Task;
@@ -19,6 +15,8 @@ interface TaskDetailViewProps {
   onDelete: (taskId: string) => void;
   onIncrement: () => void;
   onDecrement: () => void;
+  onAddLogForDate: (date: string) => void;
+  onRemoveLogForDate: (date: string) => void;
 }
 
 export function TaskDetailView({
@@ -30,67 +28,64 @@ export function TaskDetailView({
   onDelete,
   onIncrement,
   onDecrement,
+  onAddLogForDate,
+  onRemoveLogForDate,
 }: TaskDetailViewProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const { current, target } =
-    task.type === "goal"
-      ? task.frequencyType === "weekly"
+  const { current, target } = task.type === 'goal'
+    ? (task.frequencyType === 'weekly'
         ? getWeekProgress(taskLogs, dayStartTime)
-        : getMonthProgress(taskLogs, dayStartTime)
-      : { current: taskLogs.length, target: 0 };
+        : getMonthProgress(taskLogs, dayStartTime))
+    : { current: taskLogs.length, target: 0 };
 
   const percentage = target > 0 ? Math.round((current / target) * 100) : 0;
   const streak = getStreak(taskLogs, dayStartTime);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="min-h-screen"
-    >
+    <div className="min-h-screen bg-[#F9F9F9]">
       {/* Header */}
-      <header className="glass sticky top-0 z-10 px-4 py-3">
+      <header className="bg-white border-b border-gray-100 px-4 py-3 sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <button
             onClick={onBack}
-            className="p-2 hover:bg-black/5 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             aria-label="뒤로가기"
           >
-            <ArrowLeft className="w-6 h-6 text-gray-900" />
+            <ArrowLeft className="w-6 h-6 text-[#333333]" />
           </button>
-          <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <span className="text-2xl">{task.icon}</span>
+          <h1 className="text-lg text-[#333333] flex items-center gap-2">
+            <span>{task.icon}</span>
             <span>{task.title}</span>
           </h1>
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 hover:bg-black/5 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label="메뉴"
             >
-              <MoreVertical className="w-6 h-6 text-gray-600" />
+              <MoreVertical className="w-6 h-6 text-[#888888]" />
             </button>
             {showMenu && (
-              <div className="absolute right-0 mt-2 w-40 glass-card rounded-xl shadow-xl overflow-hidden z-50">
+              <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
                 <button
                   onClick={() => {
                     onEdit(task);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-3 text-left hover:bg-white/50 text-gray-900 text-sm"
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 text-[#333333] text-sm"
                 >
                   수정하기
                 </button>
                 <button
                   onClick={() => {
-                    if (confirm("이 습관을 보관하시겠습니까?")) {
+                    if (confirm('이 습관을 보관하시겠습니까?')) {
                       onDelete(task.id);
                     }
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-3 text-left hover:bg-white/50 text-red-600 text-sm"
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 text-red-600 text-sm"
                 >
                   보관하기
                 </button>
@@ -102,114 +97,102 @@ export function TaskDetailView({
 
       <div className="px-4 py-6 space-y-6">
         {/* Summary Section */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="glass-card rounded-2xl p-6"
-        >
-          {task.type === "goal" ? (
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          {task.type === 'goal' ? (
             <>
-              <div className="text-center mb-6">
-                <p className="text-3xl font-bold text-gray-900 mb-2">
-                  {task.frequencyType === "weekly" ? "이번 주" : "이번 달"}{" "}
-                  달성률 {percentage}%
+              <div className="text-center mb-4">
+                <p className="text-3xl text-[#333333] mb-2">
+                  {task.frequencyType === 'weekly' ? '이번 주' : '이번 달'} 달성률 {percentage}%
                 </p>
-                <p className="text-gray-500 font-medium">
+                <p className="text-[#888888]">
                   {current} / {target}회 완료
                 </p>
               </div>
-              <div className="flex items-center justify-center gap-3 text-lg bg-white/40 rounded-xl py-3 mx-4">
-                <span className="text-gray-600">현재 연속</span>
+              <div className="flex items-center justify-center gap-2 text-lg">
+                <span>현재 연속</span>
                 <span className="text-2xl">🔥</span>
-                <span className="font-bold text-indigo-600">{streak}일</span>
+                <span className="text-[#6366f1]">{streak}일</span>
               </div>
             </>
           ) : (
             <>
-              <div className="text-center mb-6">
-                <p className="text-4xl font-bold text-gray-900 mb-2">
+              <div className="text-center mb-4">
+                <p className="text-3xl text-[#333333] mb-2">
                   총 {current}회
                 </p>
-                <p className="text-gray-500 font-medium">누적 기록</p>
+                <p className="text-[#888888]">누적 기록</p>
               </div>
-              <div className="flex items-center justify-center gap-3 text-lg bg-white/40 rounded-xl py-3 mx-4">
-                <span className="text-gray-600">현재 연속</span>
+              <div className="flex items-center justify-center gap-2 text-lg">
+                <span>현재 연속</span>
                 <span className="text-2xl">🔥</span>
-                <span className="font-bold text-indigo-600">{streak}일</span>
+                <span className="text-[#6366f1]">{streak}일</span>
               </div>
             </>
           )}
-        </motion.div>
+        </div>
 
         {/* Counter Controls for Counter Mode */}
-        {task.type === "counter" && (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.15 }}
-            className="glass-card rounded-2xl p-4"
-          >
-            <div className="flex items-center justify-center gap-6">
+        {task.type === 'counter' && (
+          <div className="bg-white rounded-xl shadow-sm p-4">
+            <div className="flex items-center justify-center gap-4">
               <button
                 onClick={onDecrement}
-                className="w-14 h-14 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors shadow-sm"
+                className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
                 aria-label="감소"
               >
-                <Minus className="w-6 h-6 text-gray-600" />
+                <Minus className="w-5 h-5 text-[#333333]" />
               </button>
-              <span className="text-sm font-medium text-gray-500">
-                오늘 기록
-              </span>
+              <span className="text-2xl text-[#888888]">오늘 기록 조정</span>
               <button
                 onClick={onIncrement}
-                className="w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-700 flex items-center justify-center transition-colors shadow-lg shadow-indigo-200"
+                className="w-12 h-12 rounded-full bg-[#6366f1] hover:bg-[#5558e3] flex items-center justify-center transition-colors"
                 aria-label="증가"
               >
-                <Plus className="w-6 h-6 text-white" />
+                <Plus className="w-5 h-5 text-white" />
               </button>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Calendar Section */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="glass-card rounded-2xl p-6"
-        >
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            이번 달 활동
-          </h2>
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg text-[#333333] mb-4">이번 달 활동</h2>
           <Calendar
             taskLogs={taskLogs}
             color={task.color}
             dayStartTime={dayStartTime}
+            onDateClick={setSelectedDate}
           />
-        </motion.div>
+        </div>
 
         {/* Heatmap Section */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="glass-card rounded-2xl p-6"
-        >
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            지난 활동 기록
-          </h2>
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg text-[#333333] mb-4">지난 활동 기록</h2>
           {taskLogs.length > 0 ? (
-            <Heatmap taskLogs={taskLogs} color={task.color} />
+            <Heatmap
+              taskLogs={taskLogs}
+              color={task.color}
+            />
           ) : (
-            <p className="text-center text-gray-400 py-8 text-sm">
-              아직 기록이 없습니다.
-              <br />
-              오늘부터 시작해보세요!
+            <p className="text-center text-[#888888] py-8">
+              아직 기록이 없습니다. 오늘부터 시작해보세요!
             </p>
           )}
-        </motion.div>
+        </div>
       </div>
-    </motion.div>
+
+      {/* Edit Date Bottom Sheet */}
+      {selectedDate && (
+        <EditDateBottomSheet
+          date={selectedDate}
+          taskId={task.id}
+          taskLogs={taskLogs}
+          color={task.color}
+          onAddLog={onAddLogForDate}
+          onRemoveLog={onRemoveLogForDate}
+          onClose={() => setSelectedDate(null)}
+        />
+      )}
+    </div>
   );
 }

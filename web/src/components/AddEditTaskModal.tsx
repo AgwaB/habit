@@ -6,6 +6,7 @@ interface AddEditTaskModalProps {
   task?: Task | null;
   onSave: (task: Omit<Task, "id" | "createdAt" | "status">) => void;
   onClose: () => void;
+  isSaving?: boolean;
 }
 
 const EMOJI_OPTIONS = ['💪', '📚', '💧', '🏃', '🧘', '🎯', '✍️', '🎨', '🎵', '🌱', '☕', '🥗'];
@@ -20,7 +21,12 @@ const COLOR_OPTIONS = [
   '#14b8a6', // Teal
 ];
 
-export function AddEditTaskModal({ task, onSave, onClose }: AddEditTaskModalProps) {
+export function AddEditTaskModal({
+  task,
+  onSave,
+  onClose,
+  isSaving,
+}: AddEditTaskModalProps) {
   const [title, setTitle] = useState(task?.title || '');
   const [icon, setIcon] = useState(task?.icon || '💪');
   const [color, setColor] = useState(task?.color || '#6366f1');
@@ -30,6 +36,7 @@ export function AddEditTaskModal({ task, onSave, onClose }: AddEditTaskModalProp
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
     if (!title.trim()) return;
 
     const taskData = {
@@ -189,10 +196,10 @@ export function AddEditTaskModal({ task, onSave, onClose }: AddEditTaskModalProp
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={!title.trim()}
+            disabled={!title.trim() || isSaving}
             className="w-full py-4 bg-[#6366f1] text-white rounded-lg hover:bg-[#5558e3] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
-            {task ? '수정하기' : '시작하기'}
+            {isSaving ? '저장 중...' : task ? '수정하기' : '시작하기'}
           </button>
         </form>
       </div>

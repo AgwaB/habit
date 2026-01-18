@@ -4,9 +4,10 @@ interface CalendarProps {
   taskLogs: TaskLog[];
   color: string;
   dayStartTime: number;
+  onDateClick?: (date: string) => void;
 }
 
-export function Calendar({ taskLogs, color }: CalendarProps) {
+export function Calendar({ taskLogs, color, onDateClick }: CalendarProps) {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
@@ -72,14 +73,15 @@ export function Calendar({ taskLogs, color }: CalendarProps) {
               return (
                 <div
                   key={dayIndex}
-                  className={`aspect-square flex items-center justify-center rounded-lg text-sm transition-all ${
+                  className={`aspect-square flex items-center justify-center rounded-lg text-sm transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                     hasLog
-                      ? 'text-white'
+                      ? 'text-white shadow-sm'
                       : isToday
-                      ? 'bg-gray-100 text-[#333333]'
-                      : 'text-[#888888]'
+                      ? 'bg-gray-100 text-[#333333] hover:bg-gray-200'
+                      : 'text-[#888888] hover:bg-gray-50'
                   }`}
                   style={hasLog ? { backgroundColor: color } : {}}
+                  onClick={() => onDateClick && onDateClick(dateStr)}
                 >
                   {day}
                 </div>

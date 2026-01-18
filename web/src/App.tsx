@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MainDashboard } from "./components/MainDashboard";
 import { TaskDetailView } from "./components/TaskDetailView";
 import { AddEditTaskModal } from "./components/AddEditTaskModal";
@@ -40,6 +40,8 @@ export default function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isSavingTask, setIsSavingTask] = useState(false);
+  const savingTaskRef = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -98,6 +100,9 @@ export default function App() {
   };
 
   const handleAddTask = async (task: TaskDraft) => {
+    if (savingTaskRef.current) return;
+    savingTaskRef.current = true;
+    setIsSavingTask(true);
     setErrorMessage(null);
     const { data, error } = await supabase
       .from("tasks")
@@ -107,14 +112,21 @@ export default function App() {
 
     if (error || !data) {
       setErrorMessage("습관을 저장하지 못했습니다.");
+      savingTaskRef.current = false;
+      setIsSavingTask(false);
       return;
     }
 
     setTasks((prev) => [...prev, mapTask(data)]);
     setIsAddModalOpen(false);
+    savingTaskRef.current = false;
+    setIsSavingTask(false);
   };
 
   const handleEditTask = async (taskId: string, updates: TaskDraft) => {
+    if (savingTaskRef.current) return;
+    savingTaskRef.current = true;
+    setIsSavingTask(true);
     setErrorMessage(null);
     const payload = {
       title: updates.title,
@@ -134,6 +146,8 @@ export default function App() {
 
     if (error || !data) {
       setErrorMessage("습관을 수정하지 못했습니다.");
+      savingTaskRef.current = false;
+      setIsSavingTask(false);
       return;
     }
 
@@ -142,6 +156,8 @@ export default function App() {
     );
     setEditingTask(null);
     setIsAddModalOpen(false);
+    savingTaskRef.current = false;
+    setIsSavingTask(false);
   };
 
   const handleArchiveTask = async (taskId: string) => {
@@ -268,6 +284,60 @@ export default function App() {
     setTaskLogs((prev) => prev.filter((log) => log.id !== data.id));
   };
 
+  const handleAddLogForDate = async (taskId: string, date: string) => {
+    setErrorMessage(null);
+    const { data, error } = await supabase
+      .from("task_logs")
+      .insert({
+        task_id: taskId,
+        performed_at: new Date().toISOString(),
+        logical_date: date,
+      })
+      .select("*")
+      .single();
+
+    if (error || !data) {
+      setErrorMessage("기록을 저장하지 못했습니다.");
+      return;
+    }
+
+    setTaskLogs((prev) => [...prev, mapTaskLog(data)]);
+  };
+
+  const handleRemoveLogForDate = async (taskId: string, date: string) => {
+    setErrorMessage(null);
+
+    const { data, error } = await supabase
+      .from("task_logs")
+      .select("id")
+      .eq("task_id", taskId)
+      .eq("logical_date", date)
+      .order("performed_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      setErrorMessage("기록을 불러오지 못했습니다.");
+      return;
+    }
+
+    if (!data) {
+      return;
+    }
+
+    const { error: deleteError } = await supabase
+      .from("task_logs")
+      .delete()
+      .eq("id", data.id);
+
+    if (deleteError) {
+      setErrorMessage("기록을 삭제하지 못했습니다.");
+      return;
+    }
+
+    setTaskLogs((prev) => prev.filter((log) => log.id !== data.id));
+  };
+
   const handleDayStartTimeChange = (hour: number) => {
     setDayStartTime(hour);
     void persistDayStartTime(hour);
@@ -330,6 +400,10 @@ export default function App() {
           onDelete={handleArchiveTask}
           onIncrement={() => handleIncrementCounter(selectedTaskId)}
           onDecrement={() => handleDecrementCounter(selectedTaskId)}
+          onAddLogForDate={(date) => handleAddLogForDate(selectedTask.id, date)}
+          onRemoveLogForDate={(date) =>
+            handleRemoveLogForDate(selectedTask.id, date)
+          }
           errorMessage={errorMessage}
         />
       ) : (
@@ -346,6 +420,7 @@ export default function App() {
               ? (updates) => handleEditTask(editingTask.id, updates)
               : handleAddTask
           }
+          isSaving={isSavingTask}
           onClose={() => {
             setIsAddModalOpen(false);
             setEditingTask(null);
