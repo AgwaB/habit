@@ -22,6 +22,8 @@
 - 2026-01-18 21:28 - Added missing Supabase env guard to avoid blank screen and show setup message.
 - 2026-01-18 22:25 - Removed deprecated auth config keys from `supabase/config.toml`.
 - 2026-01-18 22:40 - Added missing Tailwind-like utility classes for indigo/gray and opacity variants to fix UI visibility.
+- 2026-01-18 23:10 - Added Vercel config to output `build/` for Vite.
+- 2026-01-18 23:13 - Switched Vite output to `dist/` to match Vercel defaults and updated vercel.json.
 
 ## Tasks
 - [ ] Implement Supabase-backed habit tracker based on PRD/UIUX and `example/`.
