@@ -1,0 +1,30 @@
+# AGENTS.md
+
+## Design / Structure
+- Build a new `web/` Vite React app using `example/` UI as a visual reference.
+- Add a Supabase-backed data layer (tasks, task_logs, app_settings) mapped to PRD logic.
+- Keep UI/UX behavior aligned with PRD.md and UIUX.md.
+- Use local-time logical dates based on a per-user day start hour.
+
+## Context
+- User wants the PRD/UIUX implemented with Supabase.
+- `example/` is a local state-only UI reference; `web/` is the new app.
+- No auth UI; app is single-user with Supabase anon access.
+- Supabase CLI config + migrations should live in repo root.
+
+## Changelog
+- 2026-01-18 19:19 - Created AGENTS.md with initial context and plan placeholders.
+- 2026-01-18 19:32 - Copied UI scaffold to `web/`, added Supabase client/env scaffolding, and fixed logical date handling for local timezone.
+- 2026-01-18 19:34 - Added Supabase config and initial schema/RLS migrations.
+- 2026-01-18 19:42 - Wired `web/` UI state to Supabase with loading/error handling and goal-per-day logic.
+- 2026-01-18 19:48 - Updated `web/README.md` with Supabase setup steps.
+- 2026-01-18 20:02 - Ran `npm run build` to verify production build.
+- 2026-01-18 21:28 - Added missing Supabase env guard to avoid blank screen and show setup message.
+- 2026-01-18 22:25 - Removed deprecated auth config keys from `supabase/config.toml`.
+- 2026-01-18 22:40 - Added missing Tailwind-like utility classes for indigo/gray and opacity variants to fix UI visibility.
+
+## Tasks
+- [ ] Implement Supabase-backed habit tracker based on PRD/UIUX and `example/`.
+  - Work: Created `web/` app scaffold and Supabase client/env/mappers; updated date utils; added Supabase SQL migrations/RLS/config; wired Supabase reads/writes and UI loading/error states; documented setup steps.
+  - Next: Optional cleanup (remove `web/build`) and any requested tweaks.
+  - Status: Done.
