@@ -27,6 +27,8 @@
 - 2026-01-18 23:21 - Compacted calendar layout for better on-screen fit.
 - 2026-01-19 02:09 - Added task save lock to prevent double-submit on habit creation/edit.
 - 2026-01-19 02:18 - Added interactive calendar history editing UI, bottom sheet, and supporting utilities; wired log add/remove handlers.
+- 2026-01-19 02:34 - Added missing positional utilities (bottom-0, left-0, z-40) so the edit bottom sheet is visible.
+- 2026-01-19 02:38 - Updated page title to Habit Tracker.
 
 ## Tasks
 - [ ] Implement Supabase-backed habit tracker based on PRD/UIUX and `example/`.
