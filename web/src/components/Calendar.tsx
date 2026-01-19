@@ -77,7 +77,7 @@ export function Calendar({ taskLogs, color, onDateClick }: CalendarProps) {
                     hasLog
                       ? 'text-white shadow-sm'
                       : isToday
-                      ? 'bg-gray-100 text-[#333333] hover:bg-gray-200'
+                      ? 'bg-gray-200 text-[#333333]'
                       : 'text-[#888888] hover:bg-gray-50'
                   }`}
                   style={hasLog ? { backgroundColor: color } : {}}

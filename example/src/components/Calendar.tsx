@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TaskLog } from '../types';
 
 interface CalendarProps {
@@ -9,8 +11,11 @@ interface CalendarProps {
 
 export function Calendar({ taskLogs, color, onDateClick }: CalendarProps) {
   const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
+  const [currentYear, setCurrentYear] = useState(now.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(now.getMonth());
+
+  const year = currentYear;
+  const month = currentMonth;
 
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
@@ -46,8 +51,66 @@ export function Calendar({ taskLogs, color, onDateClick }: CalendarProps) {
 
   const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
+  const goToPreviousMonth = () => {
+    if (month === 0) {
+      setCurrentMonth(11);
+      setCurrentYear(year - 1);
+    } else {
+      setCurrentMonth(month - 1);
+    }
+  };
+
+  const goToNextMonth = () => {
+    if (month === 11) {
+      setCurrentMonth(0);
+      setCurrentYear(year + 1);
+    } else {
+      setCurrentMonth(month + 1);
+    }
+  };
+
+  const goToToday = () => {
+    setCurrentYear(now.getFullYear());
+    setCurrentMonth(now.getMonth());
+  };
+
+  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth();
+
   return (
     <div>
+      {/* Month Navigator */}
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={goToPreviousMonth}
+          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label="이전 달"
+        >
+          <ChevronLeft className="w-5 h-5 text-[#333333]" />
+        </button>
+
+        <div className="flex items-center gap-2">
+          <h3 className="text-[#333333]">
+            {year}년 {month + 1}월
+          </h3>
+          {!isCurrentMonth && (
+            <button
+              onClick={goToToday}
+              className="px-2 py-1 text-xs text-[#6366f1] hover:bg-indigo-50 rounded transition-colors"
+            >
+              오늘
+            </button>
+          )}
+        </div>
+
+        <button
+          onClick={goToNextMonth}
+          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label="다음 달"
+        >
+          <ChevronRight className="w-5 h-5 text-[#333333]" />
+        </button>
+      </div>
+
       {/* Weekday headers */}
       <div className="grid grid-cols-7 gap-1.5 mb-1.5">
         {weekdays.map(day => (
