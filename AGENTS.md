@@ -33,9 +33,10 @@
 - 2026-01-19 22:59 - Removed detail heatmap section and darkened calendar “today” highlight.
 - 2026-01-19 23:12 - Added calendar month navigation and supporting CSS utilities.
 - 2026-01-19 23:35 - Added React Router for URL-based navigation with browser back support.
+- 2026-01-19 23:38 - Restored detail heatmap section to match latest example.
 
 ## Tasks
 - [ ] Implement Supabase-backed habit tracker based on PRD/UIUX and `example/`.
-  - Work: Created `web/` app scaffold and Supabase client/env/mappers; updated date utils; added Supabase SQL migrations/RLS/config; wired Supabase reads/writes and UI loading/error states; documented setup steps; added save lock to prevent double-submit; added calendar history edit bottom sheet and handlers; updated main dashboard to match latest example with mini heatmap row; removed detail heatmap; adjusted calendar today highlight; added month navigation in calendar; added URL-based navigation with browser back support.
-  - Next: Validate routing behavior and back navigation in browser.
+  - Work: Created `web/` app scaffold and Supabase client/env/mappers; updated date utils; added Supabase SQL migrations/RLS/config; wired Supabase reads/writes and UI loading/error states; documented setup steps; added save lock to prevent double-submit; added calendar history edit bottom sheet and handlers; updated main dashboard to match latest example with mini heatmap row; adjusted calendar today highlight; added month navigation in calendar; added URL-based navigation with browser back support; restored detail heatmap section.
+  - Next: Validate detail view layout (heatmap + calendar) against example.
   - Status: In progress.
