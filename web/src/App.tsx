@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { MainDashboard } from "./components/MainDashboard";
 import { TaskDetailView } from "./components/TaskDetailView";
 import { AddEditTaskModal } from "./components/AddEditTaskModal";
@@ -36,7 +37,6 @@ export default function App() {
   const [taskLogs, setTaskLogs] = useState<TaskLog[]>([]);
   const [dayStartTime, setDayStartTime] = useState(0); // 0-23 hours
   const [settingsId, setSettingsId] = useState<number | null>(null);
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -44,6 +44,8 @@ export default function App() {
   const savingTaskRef = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const activeTasks = useMemo(
     () => tasks.filter((t) => t.status === "active"),
@@ -53,12 +55,6 @@ export default function App() {
   useEffect(() => {
     void loadData();
   }, []);
-
-  useEffect(() => {
-    if (selectedTaskId && !tasks.find((task) => task.id === selectedTaskId)) {
-      setSelectedTaskId(null);
-    }
-  }, [selectedTaskId, tasks]);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -368,49 +364,47 @@ export default function App() {
     setSettingsId(data.id);
   };
 
-  const selectedTask = selectedTaskId
-    ? tasks.find((task) => task.id === selectedTaskId) ?? null
-    : null;
-
   return (
     <div className="min-h-screen">
-      {!selectedTaskId ? (
-        <MainDashboard
-          tasks={activeTasks}
-          taskLogs={taskLogs}
-          dayStartTime={dayStartTime}
-          onToggleTask={handleToggleTask}
-          onIncrementCounter={handleIncrementCounter}
-          onTaskClick={setSelectedTaskId}
-          onAddClick={() => setIsAddModalOpen(true)}
-          onSettingsClick={() => setIsSettingsOpen(true)}
-          isLoading={isLoading}
-          errorMessage={errorMessage}
-        />
-      ) : selectedTask ? (
-        <TaskDetailView
-          task={selectedTask}
-          taskLogs={taskLogs.filter((log) => log.taskId === selectedTaskId)}
-          dayStartTime={dayStartTime}
-          onBack={() => setSelectedTaskId(null)}
-          onEdit={(task) => {
-            setEditingTask(task);
-            setIsAddModalOpen(true);
-          }}
-          onDelete={handleArchiveTask}
-          onIncrement={() => handleIncrementCounter(selectedTaskId)}
-          onDecrement={() => handleDecrementCounter(selectedTaskId)}
-          onAddLogForDate={(date) => handleAddLogForDate(selectedTask.id, date)}
-          onRemoveLogForDate={(date) =>
-            handleRemoveLogForDate(selectedTask.id, date)
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <MainDashboard
+              tasks={activeTasks}
+              taskLogs={taskLogs}
+              dayStartTime={dayStartTime}
+              onToggleTask={handleToggleTask}
+              onIncrementCounter={handleIncrementCounter}
+              onTaskClick={(taskId) => navigate(`/task/${taskId}`)}
+              onAddClick={() => setIsAddModalOpen(true)}
+              onSettingsClick={() => setIsSettingsOpen(true)}
+              isLoading={isLoading}
+              errorMessage={errorMessage}
+            />
           }
-          errorMessage={errorMessage}
         />
-      ) : (
-        <div className="min-h-screen flex items-center justify-center text-gray-500">
-          불러오는 중...
-        </div>
-      )}
+        <Route
+          path="/task/:taskId"
+          element={
+            <TaskDetailRoute
+              tasks={tasks}
+              taskLogs={taskLogs}
+              dayStartTime={dayStartTime}
+              onEdit={(task) => {
+                setEditingTask(task);
+                setIsAddModalOpen(true);
+              }}
+              onDelete={handleArchiveTask}
+              onIncrementCounter={handleIncrementCounter}
+              onDecrementCounter={handleDecrementCounter}
+              onAddLogForDate={handleAddLogForDate}
+              onRemoveLogForDate={handleRemoveLogForDate}
+              errorMessage={errorMessage}
+            />
+          }
+        />
+      </Routes>
 
       {isAddModalOpen && (
         <AddEditTaskModal
@@ -438,5 +432,74 @@ export default function App() {
         />
       )}
     </div>
+  );
+}
+
+function TaskDetailRoute({
+  tasks,
+  taskLogs,
+  dayStartTime,
+  onEdit,
+  onDelete,
+  onIncrementCounter,
+  onDecrementCounter,
+  onAddLogForDate,
+  onRemoveLogForDate,
+  errorMessage,
+}: {
+  tasks: Task[];
+  taskLogs: TaskLog[];
+  dayStartTime: number;
+  onEdit: (task: Task) => void;
+  onDelete: (taskId: string) => void;
+  onIncrementCounter: (taskId: string) => void;
+  onDecrementCounter: (taskId: string) => void;
+  onAddLogForDate: (taskId: string, date: string) => void;
+  onRemoveLogForDate: (taskId: string, date: string) => void;
+  errorMessage: string | null;
+}) {
+  const { taskId } = useParams();
+  const navigate = useNavigate();
+
+  if (!taskId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        불러오는 중...
+      </div>
+    );
+  }
+
+  const selectedTask = tasks.find((task) => task.id === taskId) ?? null;
+
+  if (!selectedTask) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        해당 습관을 찾을 수 없습니다.
+      </div>
+    );
+  }
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/", { replace: true });
+    }
+  };
+
+  return (
+    <TaskDetailView
+      task={selectedTask}
+      taskLogs={taskLogs.filter((log) => log.taskId === taskId)}
+      dayStartTime={dayStartTime}
+      onBack={handleBack}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      onIncrement={() => onIncrementCounter(taskId)}
+      onDecrement={() => onDecrementCounter(taskId)}
+      onAddLogForDate={(date) => onAddLogForDate(taskId, date)}
+      onRemoveLogForDate={(date) => onRemoveLogForDate(taskId, date)}
+      errorMessage={errorMessage}
+    />
   );
 }
