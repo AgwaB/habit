@@ -29,9 +29,10 @@
 - 2026-01-19 02:18 - Added interactive calendar history editing UI, bottom sheet, and supporting utilities; wired log add/remove handlers.
 - 2026-01-19 02:34 - Added missing positional utilities (bottom-0, left-0, z-40) so the edit bottom sheet is visible.
 - 2026-01-19 02:38 - Updated page title to Habit Tracker.
+- 2026-01-19 22:41 - Updated main dashboard UI to match latest example and added responsive mini heatmap per task.
 
 ## Tasks
 - [ ] Implement Supabase-backed habit tracker based on PRD/UIUX and `example/`.
-  - Work: Created `web/` app scaffold and Supabase client/env/mappers; updated date utils; added Supabase SQL migrations/RLS/config; wired Supabase reads/writes and UI loading/error states; documented setup steps; added save lock to prevent double-submit; added calendar history edit bottom sheet and handlers; heatmap always shows.
-  - Next: Verify UI alignment and adjust calendar size if needed.
+  - Work: Created `web/` app scaffold and Supabase client/env/mappers; updated date utils; added Supabase SQL migrations/RLS/config; wired Supabase reads/writes and UI loading/error states; documented setup steps; added save lock to prevent double-submit; added calendar history edit bottom sheet and handlers; heatmap always shows; updated main dashboard to match latest example with mini heatmap row.
+  - Next: Validate mini heatmap sizing on mobile/desktop and tune if needed.
   - Status: In progress.

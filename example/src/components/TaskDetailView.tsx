@@ -131,6 +131,21 @@ export function TaskDetailView({
           )}
         </div>
 
+        {/* Heatmap Section */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg text-[#333333] mb-4">지난 활동 기록</h2>
+          {taskLogs.length > 0 ? (
+            <Heatmap
+              taskLogs={taskLogs}
+              color={task.color}
+            />
+          ) : (
+            <p className="text-center text-[#888888] py-8">
+              아직 기록이 없습니다. 오늘부터 시작해보세요!
+            </p>
+          )}
+        </div>
+
         {/* Counter Controls for Counter Mode */}
         {task.type === 'counter' && (
           <div className="bg-white rounded-xl shadow-sm p-4">
@@ -155,29 +170,14 @@ export function TaskDetailView({
         )}
 
         {/* Calendar Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg text-[#333333] mb-4">이번 달 활동</h2>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+          <h2 className="text-[#333333] mb-3">이번 달 활동</h2>
           <Calendar
             taskLogs={taskLogs}
             color={task.color}
             dayStartTime={dayStartTime}
             onDateClick={setSelectedDate}
           />
-        </div>
-
-        {/* Heatmap Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg text-[#333333] mb-4">지난 활동 기록</h2>
-          {taskLogs.length > 0 ? (
-            <Heatmap
-              taskLogs={taskLogs}
-              color={task.color}
-            />
-          ) : (
-            <p className="text-center text-[#888888] py-8">
-              아직 기록이 없습니다. 오늘부터 시작해보세요!
-            </p>
-          )}
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import { Task, TaskLog } from '../types';
 import { DonutChart } from './DonutChart';
+import { MiniHeatmap } from './MiniHeatmap';
 import { getWeekProgress, getMonthProgress, getTodayCount } from '../utils/dateUtils';
 
 interface TaskCardProps {
@@ -28,44 +29,59 @@ export function TaskCard({ task, taskLogs, dayStartTime, onToggle, onClick }: Ta
     : '기록 중';
 
   return (
-    <div 
-      className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow"
-    >
-      <div 
-        className="flex items-center gap-3 flex-1"
-        onClick={onClick}
-      >
+    <div className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
+      {/* Row 1: Title and Action */}
+      <div className="flex items-start justify-between mb-3">
+        {/* Left Section */}
         <div 
-          className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
-          style={{ backgroundColor: `${task.color}20` }}
+          className="flex items-center gap-3 flex-1 cursor-pointer"
+          onClick={onClick}
         >
-          {task.icon}
+          <div 
+            className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
+            style={{ backgroundColor: `${task.color}20` }}
+          >
+            {task.icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-[#333333] mb-1 truncate">{task.title}</h3>
+            <p className="text-sm text-[#888888]">{frequencyLabel}</p>
+          </div>
         </div>
-        <div className="flex-1">
-          <h3 className="text-[#333333] mb-1">{task.title}</h3>
-          <p className="text-sm text-[#888888]">{frequencyLabel}</p>
+
+        {/* Right Section - Action Button */}
+        <div 
+          className="flex items-center gap-3 flex-shrink-0 cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
+        >
+          {task.type === 'goal' ? (
+            <DonutChart
+              current={current}
+              target={target}
+              color={task.color}
+              size={64}
+            />
+          ) : (
+            <div className="w-16 h-16 flex items-center justify-center">
+              <span className="text-2xl font-mono text-[#333333]">{current}</span>
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Row 2: Mini Heatmap */}
       <div 
-        className="flex items-center gap-3"
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggle();
-        }}
+        className="cursor-pointer"
+        onClick={onClick}
       >
-        {task.type === 'goal' ? (
-          <DonutChart
-            current={current}
-            target={target}
-            color={task.color}
-            size={64}
-          />
-        ) : (
-          <div className="w-16 h-16 flex items-center justify-center">
-            <span className="text-2xl font-mono text-[#333333]">{current}</span>
-          </div>
-        )}
+        <MiniHeatmap
+          taskLogs={taskLogs}
+          color={task.color}
+          days={14}
+        />
       </div>
     </div>
   );

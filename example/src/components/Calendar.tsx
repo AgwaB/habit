@@ -49,18 +49,18 @@ export function Calendar({ taskLogs, color, onDateClick }: CalendarProps) {
   return (
     <div>
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 gap-2 mb-2">
+      <div className="grid grid-cols-7 gap-1.5 mb-1.5">
         {weekdays.map(day => (
-          <div key={day} className="text-center text-sm text-[#888888] py-1">
+          <div key={day} className="text-center text-xs text-[#888888] py-1">
             {day}
           </div>
         ))}
       </div>
 
       {/* Calendar grid */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {weeks.map((week, weekIndex) => (
-          <div key={weekIndex} className="grid grid-cols-7 gap-2">
+          <div key={weekIndex} className="grid grid-cols-7 gap-1.5">
             {week.map((day, dayIndex) => {
               if (day === null) {
                 return <div key={dayIndex} />;
@@ -73,7 +73,7 @@ export function Calendar({ taskLogs, color, onDateClick }: CalendarProps) {
               return (
                 <div
                   key={dayIndex}
-                  className={`aspect-square flex items-center justify-center rounded-lg text-sm transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+                  className={`aspect-square flex items-center justify-center rounded-md text-xs transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                     hasLog
                       ? 'text-white shadow-sm'
                       : isToday
